@@ -17,6 +17,7 @@ Automation library aims to provide a simple async-task library to simulating bot
     - `Keyboard.Press(KeyCode)` - presses a keyboard button - duhh
     - `Keyboard.Control(KeyCode)` - presses a button while holding Control, exists for `Shift`, `Win` and `Alt`.
     - Some more similar actions
+
 ##### Mirroring  - Windows Reflection
 - SmartProcess - A cached version of an existing `Process` type with some neat features
     - `WaitForExitAsync()` - async wait for the process to exit.

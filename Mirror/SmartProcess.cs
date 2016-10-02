@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Nito.AsyncEx;
+using nucs.Automation.Internals;
 
 namespace nucs.Automation.Mirror {
     [DebuggerDisplay("{ProcessName} - {MainWindow.Title}")]

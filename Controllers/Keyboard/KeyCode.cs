@@ -125,7 +125,7 @@ namespace nucs.Automation.Controllers {
         /// 
         /// </remarks>
         public static bool IsKeyDownAsync(this KeyCode keyCode) {
-            return NativeWin32.GetAsyncKeyState((ushort)keyCode) < 0;
+            return Native.GetAsyncKeyState((ushort)keyCode) < 0;
         }
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace nucs.Automation.Controllers {
         /// 
         /// </remarks>
         public static bool IsKeyDown(this KeyCode keyCode) {
-            return NativeWin32.GetKeyState((ushort)keyCode) < 0;
+            return Native.GetKeyState((ushort)keyCode) < 0;
         }
 
         /// <summary>
@@ -183,7 +183,7 @@ namespace nucs.Automation.Controllers {
         /// 
         /// </remarks>
         public static bool IsTogglingKeyInEffect(this KeyCode keyCode) {
-            return (NativeWin32.GetKeyState((ushort)keyCode) & 1) == 1;
+            return (Native.GetKeyState((ushort)keyCode) & 1) == 1;
         }
 
         #endregion

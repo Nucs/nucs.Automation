@@ -55,6 +55,8 @@
     <Compile Include="Controllers\Keyboard\IKeyboard.cs" />
     <Compile Include="Controllers\Keyboard\IModernKeyboard.cs" />
     <Compile Include="Controllers\InputControl.cs" />
+    <Compile Include="Internals\AsyncManualResetEvent.cs" />
+    <Compile Include="Internals\Cache.cs" />
     <Compile Include="Keyboard.cs" />
     <Compile Include="Mouse.cs" />
     <Compile Include="Controllers\Keyboard\KeyCode.cs" />
@@ -72,10 +74,6 @@
     <ProjectReference Include="..\nucs.Filesystem\nucs.Filesystem.net45\nucs.Filesystem.net45.csproj">
       <Project>{bb205bb3-37ae-4e3c-8aa1-617ab610f98a}</Project>
       <Name>nucs.Filesystem.net45</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\nucs\nucs.net45\nucs.net45.csproj">
-      <Project>{647edc67-d125-4528-8e8d-0c770ba77cff}</Project>
-      <Name>nucs.net45</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

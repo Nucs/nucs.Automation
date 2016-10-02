@@ -65,7 +65,7 @@ namespace nucs.Automation.Scripts {
             
             sproc.BringToFront();
             await sproc.WaitForRespondingAsync();
-            Keyboard.Write(scripts.StringJoin(" & "));
+            Keyboard.Write(string.Join(" & ", scripts)); 
             Keyboard.Enter();
         }
     }

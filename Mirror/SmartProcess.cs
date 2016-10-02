@@ -9,8 +9,13 @@ using Nito.AsyncEx;
 
 namespace nucs.Automation.Mirror {
     [DebuggerDisplay("{ProcessName} - {MainWindow.Title}")]
-    public class SmartProcess
-    {
+    public class SmartProcess {
+
+        /// <summary>
+        ///     Unique instance identifier.
+        /// </summary>
+        public readonly Guid GUID = Guid.NewGuid();
+
         /// <summary>
         ///     Original Process
         /// </summary>
@@ -182,7 +187,13 @@ namespace nucs.Automation.Mirror {
         /// <exception cref="T:System.PlatformNotSupportedException">The platform is Windows 98 or Windows Millennium Edition (Windows Me); set <see cref="P:System.Diagnostics.ProcessStartInfo.UseShellExecute" /> to false to access this property on Windows 98 and Windows Me.</exception>
         /// <exception cref="T:System.InvalidOperationException">The process <see cref="P:System.Diagnostics.Process.Id" /> is not available.-or- The process has exited. </exception>
         public ProcessModule MainModule {
-            get { return OGProcess.MainModule; }
+            get {
+                try {
+                    return OGProcess.MainModule;
+                } catch {
+                    return null;
+                }
+            }
         }
 
         /// <summary>Gets the name of the process.</summary>
@@ -217,7 +228,16 @@ namespace nucs.Automation.Mirror {
         /// <exception cref="T:System.NotSupportedException">You are attempting to access the <see cref="P:System.Diagnostics.Process.StartTime" /> property for a process that is running on a remote computer. This property is available only for processes that are running on the local computer. </exception>
         /// <exception cref="T:System.InvalidOperationException">The process has exited.-or-The process has not been started.</exception>
         /// <exception cref="T:System.ComponentModel.Win32Exception">An error occurred in the call to the Windows function.</exception>
-        public DateTime StartTime => OGProcess.StartTime;
+        public DateTime StartTime {
+            get {
+                try {
+                    return OGProcess.StartTime;
+                } catch (Exception) {
+                    
+                    return DateTime.MinValue;
+                }
+            }
+        } 
 
         public event EventHandler Exited {
             add { OGProcess.Exited += value; }
@@ -298,7 +318,14 @@ namespace nucs.Automation.Mirror {
             }
             return @out;
         }
-
+                /// <summary>
+        ///     Gets or create the instance out of the process object.
+        /// </summary>
+        /// <param name="process">The process to smart.</param>
+        /// <returns></returns>
+        public static SmartProcess GetCached(Guid guid) {
+            return sporcs.SingleOrDefault(sproc => sproc.GUID.Equals(guid));
+        }
         /// <summary>
         ///     Gets or create the instance out of the foreground window.
         /// </summary>

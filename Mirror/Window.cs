@@ -86,16 +86,16 @@ namespace nucs.Automation.Mirror {
         public Dictionary<string, object> Data { get; } = new Dictionary<string, object>(0);
 
         /// <summary>
+        ///     Is the current window is at the ForegroundWindow
+        /// </summary>
+        public bool IsFocused => Native.GetForegroundWindow().ToInt32() == Handle.ToInt32();
+
+        /// <summary>
         ///     Moves the current window to the given position while maintaining the window size.
         /// </summary>
         public void SetWindowPosition(Point point) {
             SetWindowPosition(point.X, point.Y);
         }
-
-        /// <summary>
-        ///     Is the current window is at the ForegroundWindow
-        /// </summary>
-        public bool IsFocused => Native.GetForegroundWindow().ToInt32() == Handle.ToInt32();
 
         /// <summary>
         ///     Moves the current window to the given position while maintaining the window size.

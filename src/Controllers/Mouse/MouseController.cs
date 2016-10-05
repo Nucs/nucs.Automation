@@ -97,6 +97,9 @@ namespace nucs.Automation.Controllers {
 
         #region Move
 
+        /// <summary>
+        ///     Moves the cursor instantly to a given x,y.
+        /// </summary>
         public void AbsoluteMove(int x, int y) {
             var inputBuffer = new INPUT {type = 0U};
             inputBuffer.inputData.mi.dwFlags = 32769U;
@@ -105,10 +108,19 @@ namespace nucs.Automation.Controllers {
             SendInput(inputBuffer);
         }
 
+        /// <summary>
+        ///     Moves the cursor instantly to a given x,y.
+        /// </summary>
         public void AbsoluteMove(Point aDestination) {
             AbsoluteMove(aDestination.X, aDestination.Y);
         }
 
+        /// <summary>
+        ///     Moves cursor in a given velocity, higher is faster (log-n).
+        /// </summary>
+        /// <param name="dx"></param>
+        /// <param name="dy"></param>
+        /// <param name="aMovementVelocityLogFactor"> higher is faster (log-n).</param>
         public async Task Move(int dx, int dy, double aMovementVelocityLogFactor = 1.0) {
             var x = Cursor.Position.X;
             var y = Cursor.Position.Y;
@@ -130,66 +142,87 @@ namespace nucs.Automation.Controllers {
             await Task.Delay(5);
         }
 
-        public async Task Move(Point destination, int aMovementVelocityLogFactor = 1) {
-            await Move(destination.X, destination.Y, aMovementVelocityLogFactor);
+        /// <summary>
+        ///     Moves cursor in a given velocity, higher is faster (log-n).
+        /// </summary>
+        /// <param name="destination"></param>
+        /// <param name="aMovementVelocityLogFactor"> higher is faster (log-n).</param>
+        public Task Move(Point destination, double aMovementVelocityLogFactor = 1) {
+            return Move(destination.X, destination.Y, aMovementVelocityLogFactor);
         }
 
-        public async Task MoveRelative(int xDisplacement, int yDisplacement, int aMovementVelocityLogFactor = 2) {
+        /// <summary>
+        ///     Moves cursor in a given velocity, relativly to current position, higher is faster (log-n).
+        /// </summary>
+        /// <param name="yDisplacement"></param>
+        /// <param name="xDisplacement"></param>
+        /// <param name="aMovementVelocityLogFactor"> higher is faster (log-n).</param>
+        public async Task MoveRelative(int xDisplacement, int yDisplacement, double aMovementVelocityLogFactor = 2) {
             var position = Cursor.Position;
             var dx = position.X + xDisplacement;
-            position = Cursor.Position;
             var dy = position.Y + yDisplacement;
             double aMovementVelocityLogFactor1 = aMovementVelocityLogFactor;
             await Move(dx, dy, aMovementVelocityLogFactor1);
         }
 
-        public Task MoveRelative(Point aDisplacement, int aMovementVelocityLogFactor = 2) {
+        /// <summary>
+        ///     Moves cursor in a given velocity, relativly to current position, higher is faster (log-n).
+        /// </summary>
+        /// <param name="aDisplacement"></param>
+        /// <param name="aMovementVelocityLogFactor"> higher is faster (log-n).</param>
+        public Task MoveRelative(Point aDisplacement, double aMovementVelocityLogFactor = 2) {
             return MoveRelative(aDisplacement.X, aDisplacement.Y, aMovementVelocityLogFactor);
         }
         #endregion
 
         #region Combo
 
-        public async Task MoveClick(int x, int y) {
+        /// <summary>
+        ///     Moves and clicks.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="btn">The specific button to click</param>
+        /// <returns></returns>
+        public async Task MoveClick(int x, int y, MouseButton btn = MouseButton.Left) {
             await Move(x, y, 1.0);
             await Task.Delay(commondelay);
-            await Click();
+            await Click(btn);
         }
 
-        public Task MoveClick(Point aPoint) {
-            return MoveClick(aPoint.X, aPoint.Y);
+        public Task MoveClick(Point aPoint, MouseButton btn = MouseButton.Left) {
+            return MoveClick(aPoint.X, aPoint.Y, btn);
         }
 
-        public async Task MoveClickHold(int x, int y, TimeSpan aWaitPeriod) {
+        /// <summary>
+        ///     Moves, presses key down, waits for given time and releases the key up.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="aWaitPeriod">The time to wait between the press down and up</param>
+        /// <param name="btn">Which button to click</param>
+        /// <returns></returns>
+        public async Task MoveClickHold(int x, int y, TimeSpan aWaitPeriod, MouseButton btn = MouseButton.Left) {
             await Move(x, y, 1.0d);
-            LeftDown();
+            SendInput(btn, MouseDirection.Down);
             await Task.Delay(aWaitPeriod + TimeSpan.FromMilliseconds(commondelay));
-            LeftUp();
+            SendInput(btn, MouseDirection.Up);
         }
 
-        public Task MoveClickHold(Point aPoint, TimeSpan aWaitPeriod) {
-            return MoveClickHold(aPoint.X, aPoint.Y, aWaitPeriod);
+        /// <summary>
+        ///     Moves, presses key down, waits for given time and releases the key up.
+        /// </summary>
+        /// <param name="aPoint"></param>
+        /// <param name="aWaitPeriod">The time to wait between the press down and up</param>
+        /// <param name="btn">Which button to click</param>
+        /// <returns></returns>
+        public Task MoveClickHold(Point aPoint, TimeSpan aWaitPeriod, MouseButton btn = MouseButton.Left) {
+            return MoveClickHold(aPoint.X, aPoint.Y, aWaitPeriod, btn);
         }
 
-        public async Task MoveClickDelay(int x, int y, TimeSpan aWaitPeriod) {
-            await MoveClick(x, y);
-            await Task.Delay(aWaitPeriod);
-        }
-
-        public Task MoveClickDelay(Point aPoint, TimeSpan aWaitPeriod) {
-            return MoveClickDelay(aPoint.X, aPoint.Y, aWaitPeriod);
-        }
-
-        public async Task MoveDelayClick(int x, int y, TimeSpan aWaitPeriod) {
-            await Move(x, y, 1.0d);
-            await Task.Delay(aWaitPeriod);
-            await Click();
-        }
-
-        public async Task MoveDelayClick(Point aPoint, TimeSpan aWaitPeriod) {
-            await MoveDelayClick(aPoint.X, aPoint.Y, aWaitPeriod);
-        }
-
+        /// <summary>
+        ///     Clicks, by default - left button.
+        /// </summary>
         public async Task Click(MouseButton btn = MouseButton.Left) {
             SendInput(btn, MouseDirection.Down);
             await Task.Delay(commondelay);
@@ -197,6 +230,9 @@ namespace nucs.Automation.Controllers {
             await Task.Delay(commondelay);
         }
 
+        /// <summary>
+        ///     Double clicks, by default - left button
+        /// </summary>
         public async Task DoubleClick(MouseButton btn = MouseButton.Left) {
             await Click(btn);
             await Task.Delay(15); //extra delay
@@ -211,15 +247,26 @@ namespace nucs.Automation.Controllers {
             await Click(MouseButton.Right);
         }
 
+        /// <summary>
+        ///     moves to (o), presses left, moves to (d), releases left
+        /// </summary>
+        /// <param name="ox">From x</param>
+        /// <param name="oy">From y</param>
+        /// <param name="dx">To x</param>
+        /// <param name="dy">To y</param>
         public async Task DragDrop(int ox, int oy, int dx, int dy) {
             await Move(ox, oy, 1.0);
             LeftDown();
             await Move(dx, dy, 1.0);
             LeftUp();
         }
-
-        public Task DragDrop(Point aFirstPoint, Point aSecondPoint) {
-            return DragDrop(aFirstPoint.X, aFirstPoint.Y, aSecondPoint.X, aSecondPoint.Y);
+        /// <summary>
+        ///     moves to (o), presses left, moves to (d), releases left
+        /// </summary>
+        /// <param name="o">From</param>
+        /// <param name="d">To</param>
+        public Task DragDrop(Point o, Point d) {
+            return DragDrop(o.X, o.Y, d.X, d.Y);
         }
 
         #endregion

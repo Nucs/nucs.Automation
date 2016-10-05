@@ -11,7 +11,10 @@ using nucs.Filesystem;
 using Shell32;
 
 namespace nucs.Automation.Scripts {
-    public static class Starter {
+    /// <summary>
+    ///     Has the basic methods for automation
+    /// </summary>
+    public static class AutoBasic {
         /// <summary>
         ///     Will start an application using Run and will return approximately the process that was opened.
         /// </summary>

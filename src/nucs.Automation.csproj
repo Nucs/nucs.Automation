@@ -60,7 +60,7 @@
     <Compile Include="Native.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Mirror\Window.cs" />
-    <Compile Include="Scripts\Starter.cs" />
+    <Compile Include="Scripts\AutoBasic.cs" />
     <Compile Include="Mirror\SmartProcess.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -84,7 +84,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\nucs.Filesystem\nucs.Filesystem.net45\nucs.Filesystem.net45.csproj">
+    <ProjectReference Include="..\..\nucs.Filesystem\src\nucs.Filesystem.net45\nucs.Filesystem.net45.csproj">
       <Project>{bb205bb3-37ae-4e3c-8aa1-617ab610f98a}</Project>
       <Name>nucs.Filesystem.net45</Name>
     </ProjectReference>

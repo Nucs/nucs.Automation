@@ -9,9 +9,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Win32Interop.Methods;
-using Win32Interop.Structs;
-using KEYBDINPUT = Win32Interop.Structs.KEYBDINPUT;
 
 namespace nucs.Automation.Controllers {
     public class KeyboardController : IModernKeyboard {
@@ -35,7 +32,7 @@ namespace nucs.Automation.Controllers {
         ///     Writes down the char that this key represents as if it was through the keyboard. - won't work on Keys like 'End' or 'Backspace' or 'Control'
         /// </summary>
         public void Write(KeyCode keycode) {
-            this.Write((char) User32.MapVirtualKey((uint) keycode, 2));
+            this.Write((char) Native.MapVirtualKey((uint) keycode, 2));
         }
 
         /// <summary>
@@ -63,11 +60,11 @@ namespace nucs.Automation.Controllers {
                 input[i].inputData.ki.wVk = 0;
                 input[i].inputData.ki.wScan = @chars[i];
                 input[i].inputData.ki.time = 0;
-                input[i].inputData.ki.dwFlags = (uint) Win32Interop.Enums.KEYEVENTF.KEYEVENTF_UNICODE;
+                input[i].inputData.ki.dwFlags = (uint)0x0004; //KEYEVENTF_UNICODE
                 input[i].inputData.ki.dwExtraInfo = 0;
             }
 
-            User32.SendInput((uint) input.Length, input, Marshal.SizeOf(typeof(INPUT)));
+            Native.SendInput((uint) input.Length, input, Marshal.SizeOf(typeof(INPUT)));
         }
 
         #endregion
@@ -87,7 +84,7 @@ namespace nucs.Automation.Controllers {
                     }
                 }
             };
-            User32.SendInput(1U, new[] {inputBuffer}, Marshal.SizeOf(typeof(INPUT)));
+            Native.SendInput(1U, new[] {inputBuffer}, Marshal.SizeOf(typeof(INPUT)));
         }
 
         public void Up(KeyCode keycode) {
@@ -103,7 +100,7 @@ namespace nucs.Automation.Controllers {
                     }
                 }
             };
-            User32.SendInput(1U, new[] {inputBuffer}, Marshal.SizeOf(typeof(INPUT)));
+            Native.SendInput(1U, new[] {inputBuffer}, Marshal.SizeOf(typeof(INPUT)));
         }
 
         /// <summary>

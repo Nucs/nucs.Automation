@@ -4,8 +4,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Win32Interop.Methods;
-using Win32Interop.Structs;
 
 namespace nucs.Automation.Controllers {
     public class MouseController {
@@ -57,8 +55,8 @@ namespace nucs.Automation.Controllers {
             SendInput(inputBuffer);
         }
 
-        protected void SendInput(INPUT input) {
-            User32.SendInput(1U, new[] { input }, Marshal.SizeOf(typeof(INPUT)));
+        private void SendInput(INPUT input) {
+            Native.SendInput(1U, new[] { input }, Marshal.SizeOf(typeof(INPUT)));
         }
 
         public void LeftDown() {

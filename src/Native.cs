@@ -136,5 +136,193 @@ namespace nucs.Automation {
         /// </remarks>
         [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true, SetLastError = true)]
         public static extern short GetKeyState(int virtualKeyCode);
+
+        /// <summary>Synthesizes keystrokes, mouse motions, and button clicks.</summary>
+        /// <param name="nInputs">
+        ///     The number of structures in the <paramref name="pInputs" /> array.
+        /// </param>
+        /// <param name="pInputs">
+        ///     An array of <see cref="INPUT" /> structures. Each structure represents an event to be inserted into the keyboard or mouse input stream.
+        /// </param>
+        /// <param name="cbSize">
+        ///     The size, in bytes, of an <see cref="INPUT" /> structure. If <paramref name="cbSize" /> is not the size of an <see cref="INPUT" /> structure, the
+        ///     function fails.
+        /// </param>
+        /// <returns>
+        ///     <para>
+        ///         The function returns the number of events that it successfully inserted into the keyboard or mouse input stream. If the function returns
+        ///         zero, the input was already blocked by another thread. To get extended error information, call GetLastError.
+        ///     </para>
+        ///     <para>
+        ///         This function fails when it is blocked by UIPI. Note that neither GetLastError nor the return value will indicate the failure was caused by
+        ///         UIPI blocking.
+        ///     </para>
+        /// </returns>
+        /// <remarks>
+        ///     <para>
+        ///         This function is subject to UIPI. Applications are permitted to inject input only into applications that are at an equal or lesser
+        ///         integrity level.
+        ///     </para>
+        ///     <para>
+        ///         The <see cref="SendInput" /> function inserts the events in the <see cref="INPUT" /> structures serially into the keyboard or mouse input
+        ///         stream. These events are not interspersed with other keyboard or mouse input events inserted either by the user (with the keyboard or mouse)
+        ///         or by calls to <see cref="keybd_event" />, <see cref="mouse_event" />, or other calls to <see cref="SendInput" />.
+        ///     </para>
+        ///     <para>
+        ///         This function does not reset the keyboard's current state. Any keys that are already pressed when the function is called might interfere with
+        ///         the events that this function generates. To avoid this problem, check the keyboard's state with the <see cref="GetAsyncKeyState" /> function
+        ///         and correct as necessary.
+        ///     </para>
+        ///     <para>
+        ///         Because the touch keyboard uses the surrogate macros defined in winnls.h to send input to the system, a listener on the keyboard event hook
+        ///         must decode input originating from the touch keyboard. For more information, see Surrogates and Supplementary Characters.
+        ///     </para>
+        ///     <para>
+        ///         An accessibility application can use <see cref="SendInput" /> to inject keystrokes corresponding to application launch shortcut keys that are
+        ///         handled by the shell. This functionality is not guaranteed to work for other types of applications.
+        ///     </para>
+        /// </remarks>
+        [DllImport("user32.dll", EntryPoint = "SendInput")]
+        public static extern uint SendInput(uint nInputs, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.Struct, SizeParamIndex = 0)] INPUT[] pInputs, int cbSize);
+
+        /// <summary>
+        ///     <para>Translates (maps) a virtual-key code into a scan code or character value, or translates a scan code into a virtual-key code.</para>
+        ///     <para>
+        ///         To specify a handle to the keyboard layout to use for translating the specified code, use the <see cref="MapVirtualKeyEx" /> function.
+        ///     </para>
+        /// </summary>
+        /// <param name="uCode">
+        ///     The virtual key code or scan code for a key. How this value is interpreted depends on the value of the <paramref name="uMapType" /> parameter.
+        /// </param>
+        /// <param name="uMapType">
+        ///     <para>
+        ///         The translation to be performed. The value of this parameter depends on the value of the <paramref name="uCode" /> parameter.
+        ///     </para>
+        ///     <list type="table">
+        ///         <item>
+        ///             <term>MAPVK_VK_TO_CHAR 2</term>
+        ///             <description>
+        ///                 <paramref name="uCode" /> is a virtual-key code and is translated into an unshifted character value in the low-order word of the
+        ///                 return value. Dead keys (diacritics) are indicated by setting the top bit of the return value. If there is no translation, the
+        ///                 function returns 0.
+        ///             </description>
+        ///         </item>
+        ///         <item>
+        ///             <term>MAPVK_VK_TO_VSC 0</term>
+        ///             <description>
+        ///                 <paramref name="uCode" /> is a virtual-key code and is translated into a scan code. If it is a virtual-key code that does not
+        ///                 distinguish between left- and right-hand keys, the left-hand scan code is returned. If there is no translation, the function returns
+        ///                 0.
+        ///             </description>
+        ///         </item>
+        ///         <item>
+        ///             <term>MAPVK_VSC_TO_VK 1</term>
+        ///             <description>
+        ///                 <paramref name="uCode" /> is a scan code and is translated into a virtual-key code that does not distinguish between left- and
+        ///                 right-hand keys. If there is no translation, the function returns 0.
+        ///             </description>
+        ///         </item>
+        ///         <item>
+        ///             <term>MAPVK_VSC_TO_VK_EX 3</term>
+        ///             <description>
+        ///                 <paramref name="uCode" /> is a scan code and is translated into a virtual-key code that distinguishes between left- and right-hand
+        ///                 keys. If there is no translation, the function returns 0.
+        ///             </description>
+        ///         </item>
+        ///     </list>
+        /// </param>
+        /// <returns>
+        ///     The return value is either a scan code, a virtual-key code, or a character value, depending on the value of <paramref name="uCode" /> and
+        ///     <paramref name="uMapType" />. If there is no translation, the return value is zero.
+        /// </returns>
+        /// <remarks>
+        ///     <para>
+        ///         An application can use <see cref="MapVirtualKey" /> to translate scan codes to the virtual-key code constants <see cref="VK.VK_SHIFT" />,
+        ///         <see cref="VK.VK_CONTROL" />, and <see cref="VK.VK_MENU" />, and vice versa. These translations do not distinguish between the left and right
+        ///         instances of the SHIFT, CTRL, or ALT keys.
+        ///     </para>
+        ///     <para>
+        ///         An application can get the scan code corresponding to the left or right instance of one of these keys by calling <see cref="MapVirtualKey" />
+        ///         with <paramref name="uCode" /> set to one of the following virtual-key code constants.
+        ///     </para>
+        /// </remarks>
+        [DllImport("user32.dll", EntryPoint = "MapVirtualKey")]
+        public static extern uint MapVirtualKey(uint uCode, uint uMapType);
     }
+
+    #region From Win32Interop 
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct INPUT {
+        /// DWORD->unsigned int
+        public uint type;
+
+        /// Anonymous_dccf47da_5155_438b_92bc_41adbefe840c
+        public INPUT_DATA inputData;
+    }
+
+    [StructLayout(LayoutKind.Explicit)]
+    internal struct INPUT_DATA {
+        /// MOUSEINPUT->tagMOUSEINPUT
+        [FieldOffset(0)] public MOUSEINPUT mi;
+
+        /// KEYBDINPUT->tagKEYBDINPUT
+        [FieldOffset(0)] public KEYBDINPUT ki;
+
+        /// HARDWAREINPUT->tagHARDWAREINPUT
+        [FieldOffset(0)] public HARDWAREINPUT hi;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct MOUSEINPUT {
+        /// LONG->int
+        public int dx;
+
+        /// LONG->int
+        public int dy;
+
+        /// DWORD->unsigned int
+        public uint mouseData;
+
+        /// DWORD->unsigned int
+        public uint dwFlags;
+
+        /// DWORD->unsigned int
+        public uint time;
+
+        /// ULONG_PTR->unsigned int
+        public uint dwExtraInfo;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct KEYBDINPUT {
+        /// WORD->unsigned short
+        public ushort wVk;
+
+        /// WORD->unsigned short
+        public ushort wScan;
+
+        /// DWORD->unsigned int
+        public uint dwFlags;
+
+        /// DWORD->unsigned int
+        public uint time;
+
+        /// ULONG_PTR->unsigned int
+        public uint dwExtraInfo;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct HARDWAREINPUT {
+        /// DWORD->unsigned int
+        public uint uMsg;
+
+        /// WORD->unsigned short
+        public ushort wParamL;
+
+        /// WORD->unsigned short
+        public ushort wParamH;
+    }
+
+    #endregion
 }

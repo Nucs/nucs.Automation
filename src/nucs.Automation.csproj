@@ -71,13 +71,24 @@
     <Compile Include="Mirror\SmartProcess.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\nucs.Filesystem\nucs.Filesystem.net45\nucs.Filesystem.net45.csproj">
+    <ProjectReference Include="..\..\nucs.Filesystem\nucs.Filesystem.net45\nucs.Filesystem.net45.csproj">
       <Project>{bb205bb3-37ae-4e3c-8aa1-617ab610f98a}</Project>
       <Name>nucs.Filesystem.net45</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="Shell32">
+      <Guid>{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

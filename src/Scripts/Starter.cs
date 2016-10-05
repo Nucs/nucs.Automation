@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using nucs.Automation.Controllers;
 using nucs.Automation;
 using nucs.Automation.Mirror;
+using nucs.Filesystem;
+using Shell32;
 
 namespace nucs.Automation.Scripts {
     public static class Starter {
@@ -16,15 +19,17 @@ namespace nucs.Automation.Scripts {
         /// <param name="returnProcess">Should the code go through returning the started process?</param>
         /// <param name="processIdentifier">A method to identify the new process, null if not to use this method.</param>
         public static async Task<SmartProcess> Run(string application,bool returnProcess ,Func<Process, bool> processIdentifier = null) {
-            var sproc = SmartProcess.Get("explorer");
             await Task.Yield();
+            var sproc = SmartProcess.Get("explorer");
             _recapture:
             var win = sproc.Windows.FirstOrDefault(w => w.Type == WindowType.Run);
             if (win == null) {
-                Keyboard.Window(KeyCode.R);
+                /*Keyboard.Window(KeyCode.R);*/
+                new Shell32.Shell().FileRun(); //faster
                 goto _recapture;
             }
             win.BringToFront();
+            Thread.Sleep(300);
             await win.WaitForRespondingAsync();
 
             win.Keyboard.Write(application);
@@ -54,6 +59,27 @@ namespace nucs.Automation.Scripts {
         }
 
         /// <summary>
+        ///     Generates run as admin startinfo
+        /// </summary>
+        private static ProcessStartInfo __generate_info => new ProcessStartInfo() { Verb = "runas", WorkingDirectory = null, CreateNoWindow = false, UseShellExecute = true};
+        /// <summary>
+        ///     Will start an application using Process.Start() with default ProcessStartInfo including 'runas' to elevate priviledges.
+        /// </summary>
+        /// <param name="filename">The file to start.</param>
+        public static SmartProcess RunUsingProcessStart(string filename) {
+            var t = __generate_info;
+
+            filename = Paths.NormalizePath(filename);
+            if (File.Exists(filename) && File.GetAttributes(filename).HasFlag(FileAttributes.Directory) == false) {
+                t.WorkingDirectory = Path.GetDirectoryName(filename) ?? "";
+            }
+
+            t.FileName = filename;
+            var proc = Process.Start(t);
+            return proc == null ? null : SmartProcess.Get(proc);
+        }
+
+        /// <summary>
         ///     Run commands in a new Cmd window.
         /// </summary>
         /// <param name="scripts">The commands to run, in order</param>
@@ -64,7 +90,8 @@ namespace nucs.Automation.Scripts {
                 sproc = SmartProcess.Get("cmd");
             
             sproc.BringToFront();
-            await sproc.WaitForRespondingAsync();
+            Thread.Sleep(300);
+            //await sproc.WaitForRespondingAsync();
             Keyboard.Write(string.Join(" & ", scripts)); 
             Keyboard.Enter();
         }

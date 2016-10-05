@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -23,7 +24,13 @@ namespace nucs.Automation.Mirror {
 
         private SmartProcess(Process ogProcess) {
             OGProcess = ogProcess;
-            if (ogProcess.HasExited)
+            bool hasexited = false;
+            try {
+                hasexited = ogProcess.HasExited;
+            } catch (Win32Exception) {
+                hasexited = Process.GetProcesses().FirstOrDefault(p=>p.Id== ogProcess.Id) == null;
+            }
+            if (hasexited)
                 _exitWaiter.Set();
             else
                 OGProcess.Exited += (sender, args) => _exitWaiter.Set();

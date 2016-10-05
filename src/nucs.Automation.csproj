@@ -51,6 +51,7 @@
     <Compile Include="Controllers\Keyboard\IKeyboard.cs" />
     <Compile Include="Controllers\Keyboard\IModernKeyboard.cs" />
     <Compile Include="Controllers\InputControl.cs" />
+    <Compile Include="Controllers\Mouse\MouseButton.cs" />
     <Compile Include="Internals\AsyncManualResetEvent.cs" />
     <Compile Include="Internals\Cache.cs" />
     <Compile Include="Keyboard.cs" />

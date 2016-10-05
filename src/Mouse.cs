@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Drawing;
+using System.Threading.Tasks;
 using nucs.Automation.Controllers;
 
 namespace nucs.Automation {
-        #region Keyboard
-
         /// <summary>
         ///     Performs various actions with a mouse
         /// </summary>
 
         public static class Mouse {
             private static readonly MouseController controller = new MouseController();
-
             public static void LeftDown() {
                 controller.LeftDown();
             }
@@ -52,79 +50,78 @@ namespace nucs.Automation {
                 controller.AbsoluteMove(aDestination);
             }
 
-            public static void Move(int dx, int dy, double aMovementVelocityLogFactor = 1) {
-                controller.Move(dx, dy, aMovementVelocityLogFactor);
+            public static Task Move(int dx, int dy, double aMovementVelocityLogFactor = 1) {
+                return controller.Move(dx, dy, aMovementVelocityLogFactor);
             }
 
-            public static void Move(Point destination, int aMovementVelocityLogFactor = 1) {
-                controller.Move(destination, aMovementVelocityLogFactor);
+            public static Task Move(Point destination, int aMovementVelocityLogFactor = 1) {
+                return controller.Move(destination, aMovementVelocityLogFactor);
             }
 
-            public static void MoveRelative(int xDisplacement, int yDisplacement, int aMovementVelocityLogFactor = 2) {
-                controller.MoveRelative(xDisplacement, yDisplacement, aMovementVelocityLogFactor);
+            public static Task MoveRelative(int xDisplacement, int yDisplacement, int aMovementVelocityLogFactor = 2) {
+                return controller.MoveRelative(xDisplacement, yDisplacement, aMovementVelocityLogFactor);
             }
 
-            public static void MoveRelative(Point aDisplacement, int aMovementVelocityLogFactor = 2) {
-                controller.MoveRelative(aDisplacement, aMovementVelocityLogFactor);
+            public static Task MoveRelative(Point aDisplacement, int aMovementVelocityLogFactor = 2) {
+                return controller.MoveRelative(aDisplacement, aMovementVelocityLogFactor);
             }
 
-            public static void MoveClick(int x, int y) {
-                controller.MoveClick(x, y);
+            public static Task MoveClick(int x, int y) {
+                return controller.MoveClick(x, y);
             }
 
-            public static void MoveClick(Point aPoint) {
-                controller.MoveClick(aPoint);
+            public static Task MoveClick(Point aPoint) {
+                return controller.MoveClick(aPoint);
             }
 
-            public static void MoveClickHold(int x, int y, TimeSpan aWaitPeriod) {
-                controller.MoveClickHold(x, y, aWaitPeriod);
+            public static Task MoveClickHold(int x, int y, TimeSpan aWaitPeriod) {
+                return controller.MoveClickHold(x, y, aWaitPeriod);
             }
 
-            public static void MoveClickHold(Point aPoint, TimeSpan aWaitPeriod) {
-                controller.MoveClickHold(aPoint, aWaitPeriod);
+            public static Task MoveClickHold(Point aPoint, TimeSpan aWaitPeriod) {
+                return controller.MoveClickHold(aPoint, aWaitPeriod);
             }
 
-            public static void MoveClickDelay(int x, int y, TimeSpan aWaitPeriod) {
-                controller.MoveClickDelay(x, y, aWaitPeriod);
+            public static Task MoveClickDelay(int x, int y, TimeSpan aWaitPeriod) {
+                return controller.MoveClickDelay(x, y, aWaitPeriod);
             }
 
-            public static void MoveClickDelay(Point aPoint, TimeSpan aWaitPeriod) {
-                controller.MoveClickDelay(aPoint, aWaitPeriod);
+            public static Task MoveClickDelay(Point aPoint, TimeSpan aWaitPeriod) {
+                return controller.MoveClickDelay(aPoint, aWaitPeriod);
             }
 
-            public static void MoveDelayClick(int x, int y, TimeSpan aWaitPeriod) {
-                controller.MoveDelayClick(x, y, aWaitPeriod);
+            public static Task MoveDelayClick(int x, int y, TimeSpan aWaitPeriod) {
+                return controller.MoveDelayClick(x, y, aWaitPeriod);
             }
 
-            public static void MoveDelayClick(Point aPoint, TimeSpan aWaitPeriod) {
-                controller.MoveDelayClick(aPoint, aWaitPeriod);
+            public static Task MoveDelayClick(Point aPoint, TimeSpan aWaitPeriod) {
+                return controller.MoveDelayClick(aPoint, aWaitPeriod);
             }
 
-            public static void Click() {
-                controller.Click();
+            public static Task Click(MouseButton btn = MouseButton.Left) {
+                return controller.Click(btn);
             }
 
-            public static void DoubleClick() {
-                controller.DoubleClick();
+            public static Task DoubleClick(MouseButton btn = MouseButton.Left) {
+                return controller.DoubleClick(btn);
             }
 
-            public static void MiddleClick() {
-                controller.MiddleClick();
+            public static Task MiddleClick() {
+                return controller.MiddleClick();
             }
 
-            public static void RightClick() {
-                controller.RightClick();
+            public static Task RightClick() {
+                return controller.RightClick();
             }
 
-            public static void DragDrop(int ox, int oy, int dx, int dy) {
-                controller.DragDrop(ox, oy, dx, dy);
+            public static Task DragDrop(int ox, int oy, int dx, int dy) {
+                return controller.DragDrop(ox, oy, dx, dy);
             }
 
-            public static void DragDrop(Point aFirstPoint, Point aSecondPoint) {
-                controller.DragDrop(aFirstPoint, aSecondPoint);
+            public static Task DragDrop(Point aFirstPoint, Point aSecondPoint) {
+                return controller.DragDrop(aFirstPoint, aSecondPoint);
             }
         }
 
-        #endregion
 
 }

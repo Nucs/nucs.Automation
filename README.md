@@ -45,7 +45,7 @@ Automation library aims to provide a simple async-task library to simulating bot
     - Static Methods
         - `Create(SmartProcess process, HWND handle)` creates a window object.
        
-##### Starter - static class with basic methods
+##### AutoBasic - a static class with basic automation methods
 	- `Run(string application)`- runs a program using WIN+R with administrator elevation.
 	- `RunUsingProcessStart(string application)` - runs a program in the oldschool with highest possible elevation.
 	- `Cmd(params string[] scripts)` - starts a cmd and runs a sequence of commands.

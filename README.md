@@ -8,8 +8,8 @@ Automation library aims to provide a simple async-task library to simulating bot
 - `Mouse` - static mouse simulator (instance of `MouseController` w/o interface).
     - `Move(Point xy, double velocity)` - moves the cursor in a realistic way.
     - `MoveAbsolute(Point)` - moves the cursor instantly to the given point.
-    - `Click()` - left click in the current location.
-    - `DoubleClick()` - you guessed it!
+    - `Click(MouseButton)` - click in the current location.
+    - `DoubleClick(MouseButton)` - you guessed it!
     - `MoveRelative()` - Move the mouse relativly to the mouse current location.
     - `MiddleClick()` ,`RightClick()` ,`DragDrop(Point from, Point to)`, `LeftDown()`, `LeftUp()`, `WheelDown()`, `WheelUp()` and so on...
 - `Keyboard` - static keyboard simulator (instance of `KeyboardController` that implements `IModernKeyboard`).
@@ -44,11 +44,16 @@ Automation library aims to provide a simple async-task library to simulating bot
     - `Keyboard` - is essentially same as static `Keyboard`.
     - Static Methods
         - `Create(SmartProcess process, HWND handle)` creates a window object.
-
+       
+##### AutoBasic - a static class with basic automation methods
+	- `Run(string application)`- runs a program using WIN+R with administrator elevation.
+	- `RunUsingProcessStart(string application)` - runs a program in the oldschool with highest possible elevation.
+	- `Cmd(params string[] scripts)` - starts a cmd and runs a sequence of commands.
+	
 #### Real-World Example
 This example will run a program using WIN+R and will return the process that has opened.
 ```C#
-Func<Process, bool> processIdentifier = proc=>proc.ProcessName=="notepad++"; //will open a notepad
+
 var application = "notepad++.exe"
 
 var sproc = SmartProcess.Get("explorer"); //Find the explorer process
@@ -60,6 +65,7 @@ if (win == null) { //if it does not already exist - create one.
 	Keyboard.Window(KeyCode.R); //press WIN+R
 	goto _recapture;
 }
+
 win.BringToFront(); //make sure it is in the front
 await win.WaitForRespondingAsync(); //wait till the window is able to accept input - important for slow PCs
 
@@ -69,27 +75,24 @@ Thread.Sleep(200); //some delay to let the program actually open
 
 //Get the process
 
-if (processIdentifier != null) { //if for some reason it is not in the front - get the newest process of this type
-	var p = Process.GetProcesses().Where(processIdentifier).OrderByDescending(pp => {
+	var p = Process.GetProcesses().ToArray();
+var foreground = SmartProcess.GetForeground();
+if (foreground.ProcessName == application) //is foreground the new application?
+	return foreground;
+//Foreground is not the given application! find the newest from all processes
+var newest = Process.GetProcesses().Where(proc=>proc.ProcessName==application).OrderByDescending(pp => {
 		try {
 			return pp.StartTime.Ticks;
 		} catch {
 			return 0;
 		}
-	}).ToArray();
-
-	var @out = p.FirstOrDefault(proc => proc.Id == foreg.Id && proc.ProcessName == foreg.ProcessName);
-	if (@out != null) {
-		return SmartProcess.Get(@out); //cache this process into a smartprocess
-	}
+	}).FirstOrDefault();
 }
-
-return SmartProcess.GetForeground(); //returns a SmartProcess object of the foreground process - just the one that was recently opened;
+return newest;
 
 ```
-
-##### License
-MIT License
+---
+#### MIT License
 
 Copyright (c) 2016 Eli Belash
 

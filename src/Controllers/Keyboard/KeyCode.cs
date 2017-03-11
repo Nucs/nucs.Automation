@@ -613,7 +613,10 @@ namespace nucs.Automation.Controllers {
         Zoom = (ushort)251,
         NoName = (ushort)252,
         PA1 = (ushort)253,
-        OEM_Clear = (ushort)254
+        OEM_Clear = (ushort)254,
+        // comboes
+
+
     }
 
 }

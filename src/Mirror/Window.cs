@@ -2,24 +2,30 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Input;
+using Keyboard;
 using nucs.Automation.Controllers;
 using nucs.Automation.Internals;
 using nucs.Automation.Mirror.Helpers;
 using nucs.Filesystem.Monitoring.Windows;
 using nucs.SystemCore;
 using HWND = System.IntPtr;
+using Key = System.Windows.Input.Key;
+using KeyDesc = Keyboard.Key;
+using MouseButton = nucs.Automation.Controllers.MouseButton;
 
 namespace nucs.Automation.Mirror {
     /// <summary>
     ///     Tools to find a window specific
     /// </summary>
-    [DebuggerDisplay("{ProcessName} - {Title}")]
+    [DebuggerDisplay("{ProcessName} - {Title} - {ClassName}")]
     public class Window {
         /// <summary>
         ///     The process this window belongs to.
@@ -29,7 +35,7 @@ namespace nucs.Automation.Mirror {
         /// <summary>
         ///     The window handle (hWnd).
         /// </summary>
-        public HWND Handle { get; set; }
+        public IntPtr Handle { get; set; }
 
         /// <summary>
         ///     Returns window title, if failed returns null.
@@ -49,6 +55,29 @@ namespace nucs.Automation.Mirror {
                 }
             }
         }
+        
+        /// <summary>
+        ///     Gets this window / control associated text.
+        /// </summary>
+        /// <returns></returns>
+        public string GetText() {
+            StringBuilder sb = new StringBuilder(65535);
+            // needs to be big enough for the whole text
+            Native.SendMessage(Handle, 0xD, (IntPtr) sb.Length, sb);
+            return sb.ToString();
+        }
+        /// <summary>
+        ///     The parent window handle of this window.
+        /// </summary>
+        public HWND Parent => Native.GetParent(Handle);
+
+        /// <summary>
+        ///     Gets or Sets the window state.
+        /// </summary>
+        public WindowState WindowState {
+            get { return Native.GetPlacement(this.Handle).showCmd; }
+            set { Native.ShowWindowAsync(this.Handle, value); }
+        }
 
         /// <summary>
         ///     The process name of this window
@@ -66,6 +95,30 @@ namespace nucs.Automation.Mirror {
         public bool IsVisible => Native.IsWindowVisible(Handle);
 
         /// <summary>
+        ///     Gets the ClassName of the current window.
+        /// </summary>
+        public string ClassName {
+            get {
+                StringBuilder _cn = new StringBuilder(256);
+                return Native.GetClassName(Handle, _cn, _cn.Capacity) != 0 ? _cn.ToString() : null;
+            }
+        }
+
+        /// <summary>
+        ///     Shows the window and set it as foreground.
+        /// </summary>
+        public void Show() {
+            Process.Show();
+        }
+
+        /// <summary>
+        ///     Hides the window.
+        /// </summary>
+        public void Hide() {
+            Process.Hide();
+        }
+
+        /// <summary>
         ///     Sets this window as ForegroundWindow, basiclly set focus on it and bring to the front
         /// </summary>
         /// <returns>If returns false meaning it can be set to foreground</returns>
@@ -74,7 +127,15 @@ namespace nucs.Automation.Mirror {
         /// <summary>
         ///     Position of the window
         /// </summary>
-        public Rectangle Position => Native.GetWindowRect(Handle);
+        public Rectangle Position {
+            get { return Native.GetWindowRect(Handle); }
+            set {
+                if (value.X != -1 && value.Y != -1)
+                    SetWindowPosition(value.X, value.Y);
+                if (value.Width != -1 && value.Height != -1)
+                    SetWindowSize(value.Width, value.Height);
+            }
+        }
 
         /// <summary>
         ///     The classification of this window
@@ -128,9 +189,6 @@ namespace nucs.Automation.Mirror {
             Native.MoveWindow(Handle, rect.X, rect.Y, width, height, true);
         }
 
-        public void ChangeWindowState(WindowState state) {
-            Native.ShowWindowAsync(Handle, (int) state);
-        }
         /// <summary>
         ///     Waits for the process to be responding
         /// </summary>
@@ -147,6 +205,7 @@ namespace nucs.Automation.Mirror {
             await Task.Yield();
             WaitForResponding();
         }
+
         #region Constructor
 
         private static readonly ExplorerMonitor _monitor;
@@ -183,7 +242,7 @@ namespace nucs.Automation.Mirror {
             Process = process;
             Handle = handle;
             Mouse = new RelativeMouseEmulator(this);
-            Keyboard = new KeyboardEmulator();
+            KeyboardController = new KeyboardControllerEmulator(handle);
         }
 
         #endregion
@@ -386,59 +445,68 @@ namespace nucs.Automation.Mirror {
         ///     Perform clicks relative to the window position only!
         ///     For otherwise, access static instance Mouse
         /// </summary>
-        public KeyboardEmulator Keyboard { get; }
+        public KeyboardControllerEmulator KeyboardController { get; }
 
-        public class KeyboardEmulator : IModernKeyboard {
+        public class KeyboardControllerEmulator : IExtendedKeyboardController {
+            public HWND hWnd { get; set; }
+
+            public KeyboardControllerEmulator(HWND hWnd) {
+                this.hWnd = hWnd;
+            }
+
             /// <summary>
             ///     Writes down the char that this key represents as if it was through the keyboard. - won't work on Keys like 'End' or 'Backspace' or 'Control'
             /// </summary>
             public void Write(Keys key) {
-                Automation.Keyboard.Write(key);
+                Write((char) key);
             }
 
             /// <summary>
             ///     Writes down this string as if it was through the keyboard.
             /// </summary>
             public void Write(string text) {
-                Automation.Keyboard.Write(text);
+                Messaging.SendChatTextSend(hWnd, text);
             }
 
             /// <summary>
             ///     Writes down the char that this key represents as if it was through the keyboard. - won't work on Keys like 'End' or 'Backspace' or 'Control'
             /// </summary>
             public void Write(KeyCode keycode) {
-                Automation.Keyboard.Write(keycode);
+                this.Write((char) Native.MapVirtualKey((uint) keycode, 2));
             }
 
             /// <summary>
             ///     Writes down the char that this key represents as if it was through the keyboard.
             /// </summary>
             public void Write(char @char) {
-                Automation.Keyboard.Write(@char);
+                    Messaging.SendChar(hWnd, @char, false);
             }
 
             /// <summary>
             ///     Writes down the characters as if it was through the keyboard.
             /// </summary>
             public void Write(int utf32) {
-                Automation.Keyboard.Write(utf32);
+                string unicodeString = Char.ConvertFromUtf32(utf32);
+                this.Write(unicodeString);
             }
 
             /// <summary>
             ///     Writes down the characters as if it was through the keyboard.
             /// </summary>
             public void Write(params char[] chars) {
-                Automation.Keyboard.Write(chars);
+                foreach (var c in chars) {
+                    Messaging.SendChar(hWnd, c, false);
+                }
             }
 
             /// <summary>Presses down this keycode.</summary>
             public void Down(KeyCode keycode) {
-                Automation.Keyboard.Down(keycode);
+                Messaging.SendPostDown(hWnd, new KeyDesc(keycode));
             }
 
             /// <summary>Releases this keycode.</summary>
             public void Up(KeyCode keycode) {
-                Automation.Keyboard.Up(keycode);
+                Messaging.SendPostUp(hWnd, new KeyDesc(keycode));
             }
 
             /// <summary>
@@ -447,39 +515,47 @@ namespace nucs.Automation.Mirror {
             /// <param name="keycode">The keycode to press</param>
             /// <param name="delay">The delay between the actions in milliseconds</param>
             public void Press(KeyCode keycode, uint delay = 20) {
-                Automation.Keyboard.Press(keycode, delay);
+                Messaging.PostMessage(hWnd, new KeyDesc(keycode));
             }
 
             public void PressAsync(KeyCode keycode, uint delay = 20) {
-                Automation.Keyboard.PressAsync(keycode, delay);
+                Messaging.PostMessage(hWnd, new KeyDesc(keycode));
             }
 
             public void Enter() {
-                Automation.Keyboard.Enter();
+                Messaging.PostMessage(hWnd, new KeyDesc(KeyCode.Enter));
             }
 
             public void Back() {
-                Automation.Keyboard.Back();
+                Messaging.PostMessage(hWnd, new KeyDesc(KeyCode.Back));
             }
 
             public void Control(KeyCode keycode) {
-                Automation.Keyboard.Control(keycode);
+                Messaging.SendPostDown(hWnd, new KeyDesc(KeyCode.Control));
+                Messaging.PostMessage(hWnd, new KeyDesc(keycode));
+                Messaging.SendPostUp(hWnd, new KeyDesc(KeyCode.Control));
             }
 
             public void Win(KeyCode keycode) {
-                Automation.Keyboard.Win(keycode);
+                Messaging.SendPostDown(hWnd, new KeyDesc(KeyCode.LWin));
+                Messaging.PostMessage(hWnd, new KeyDesc(keycode));
+                Messaging.SendPostUp(hWnd, new KeyDesc(KeyCode.LWin));
             }
 
             public void Shift(KeyCode keycode) {
-                Automation.Keyboard.Shift(keycode);
+                Messaging.SendPostDown(hWnd, new KeyDesc(KeyCode.Shift));
+                Messaging.PostMessage(hWnd, new KeyDesc(keycode));
+                Messaging.SendPostUp(hWnd, new KeyDesc(KeyCode.Shift));
             }
 
             public void Alt(KeyCode keycode) {
-                Automation.Keyboard.Alt(keycode);
+                Messaging.SendPostDown(hWnd, new KeyDesc(KeyCode.Alt));
+                Messaging.PostMessage(hWnd, new KeyDesc(keycode));
+                Messaging.SendPostUp(hWnd, new KeyDesc(KeyCode.Alt));
             }
 
             public void Window(KeyCode keycode) {
-                Automation.Keyboard.Window(keycode);
+                Win(keycode);
             }
         }
 

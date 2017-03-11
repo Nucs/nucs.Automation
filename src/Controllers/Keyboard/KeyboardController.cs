@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace nucs.Automation.Controllers {
-    public class KeyboardController : IModernKeyboard {
+    public class KeyboardController : IExtendedKeyboardController {
         #region Write
 
         /// <summary>
@@ -115,9 +115,9 @@ namespace nucs.Automation.Controllers {
         }
 
 #if !NET4 && !NET40
-        public async void PressAsync(KeyCode keycode, uint delay = 20) {
+        public void PressAsync(KeyCode keycode, uint delay = 20) {
             Down(keycode);
-            await Task.Delay((int) delay);
+            Task.Delay((int) delay).Wait();
             Up(keycode);
         }
 #endif

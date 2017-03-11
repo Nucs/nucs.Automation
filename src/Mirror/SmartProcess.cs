@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using nucs.Automation.Internals;
 
 namespace nucs.Automation.Mirror {
-    [DebuggerDisplay("{ProcessName} - {MainWindow.Title}")]
+    [DebuggerDisplay("{ProcessName} - {MainWindow.Title} - {Main.MainWindow.ClassName}")]
     public class SmartProcess {
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace nucs.Automation.Mirror {
         /// </summary>
         public Process OGProcess { get; set; }
 
-        private SmartProcess(Process ogProcess) {
+        public SmartProcess(Process ogProcess) {
             OGProcess = ogProcess;
             bool hasexited = false;
             try {
@@ -55,6 +55,19 @@ namespace nucs.Automation.Mirror {
             remove { OGProcess.Disposed -= value; }
         }
 
+        /// <summary>
+        ///     Shows the window and set it as foreground.
+        /// </summary>
+        public void Show() {
+            Native.SendMessage(MainWindowHandle, WM.SYSCOMMAND, 0xF120, 0);
+        }
+
+        /// <summary>
+        ///     Hides the window.
+        /// </summary>
+        public void Hide() {
+            Native.SendMessage(MainWindowHandle, WM.SYSCOMMAND, 0xF020, 0);
+        }
         /// <summary>Closes a process that has a user interface by sending a close message to its main window.</summary>
         /// <returns>true if the close message was successfully sent; false if the associated process does not have a main window or if the main window is disabled (for example if a modal dialog is being shown).</returns>
         /// <exception cref="T:System.PlatformNotSupportedException">The platform is Windows 98 or Windows Millennium Edition (Windows Me); set the <see cref="P:System.Diagnostics.ProcessStartInfo.UseShellExecute" /> property to false to access this property on Windows 98 and Windows Me.</exception>

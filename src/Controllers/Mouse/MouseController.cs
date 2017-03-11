@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace nucs.Automation.Controllers {
-    public class MouseController {
+    public class MouseController : IMouseController {
         private readonly int desktopHeight = SystemInformation.PrimaryMonitorSize.Height;
         private readonly int desktopWidth = SystemInformation.PrimaryMonitorSize.Width;
 
@@ -27,7 +27,7 @@ namespace nucs.Automation.Controllers {
             return _rand.Next(from, to);
         }
 
-        protected int commondelay => BaseDelay+rand(0, 20);
+        public int CommonDelay => BaseDelay+rand(0, 20);
 
         /// <summary>
         /// Sends input based on the given enums
@@ -184,7 +184,7 @@ namespace nucs.Automation.Controllers {
         /// <returns></returns>
         public async Task MoveClick(int x, int y, MouseButton btn = MouseButton.Left) {
             await Move(x, y, 1.0);
-            await Task.Delay(commondelay);
+            await Task.Delay(CommonDelay);
             await Click(btn);
         }
 
@@ -203,7 +203,7 @@ namespace nucs.Automation.Controllers {
         public async Task MoveClickHold(int x, int y, TimeSpan aWaitPeriod, MouseButton btn = MouseButton.Left) {
             await Move(x, y, 1.0d);
             SendInput(btn, MouseDirection.Down);
-            await Task.Delay(aWaitPeriod + TimeSpan.FromMilliseconds(commondelay));
+            await Task.Delay(aWaitPeriod + TimeSpan.FromMilliseconds(CommonDelay));
             SendInput(btn, MouseDirection.Up);
         }
 
@@ -223,9 +223,9 @@ namespace nucs.Automation.Controllers {
         /// </summary>
         public async Task Click(MouseButton btn = MouseButton.Left) {
             SendInput(btn, MouseDirection.Down);
-            await Task.Delay(commondelay);
+            await Task.Delay(CommonDelay);
             SendInput(btn, MouseDirection.Up);
-            await Task.Delay(commondelay);
+            await Task.Delay(CommonDelay);
         }
 
         /// <summary>
@@ -269,4 +269,5 @@ namespace nucs.Automation.Controllers {
 
         #endregion
     }
+
 }

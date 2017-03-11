@@ -22,7 +22,7 @@ namespace nucs.Automation.Scripts {
         /// <param name="returnProcess">Should the code go through returning the started process?</param>
         /// <param name="processIdentifier">A method to identify the new process, null if not to use this method.</param>
         public static async Task<SmartProcess> Run(string application,bool returnProcess ,Func<Process, bool> processIdentifier = null) {
-            await Task.Yield();
+            await Task.Yield(); //immediatly go async
             var sproc = SmartProcess.Get("explorer");
             _recapture:
             var win = sproc.Windows.FirstOrDefault(w => w.Type == WindowType.Run);
@@ -35,8 +35,8 @@ namespace nucs.Automation.Scripts {
             Thread.Sleep(300);
             await win.WaitForRespondingAsync();
 
-            win.Keyboard.Write(application);
-            win.Keyboard.Enter();
+            win.KeyboardController.Write(application);
+            win.KeyboardController.Enter();
             if (!returnProcess)
                 return null;
             Thread.Sleep(200);
@@ -65,6 +65,7 @@ namespace nucs.Automation.Scripts {
         ///     Generates run as admin startinfo
         /// </summary>
         private static ProcessStartInfo __generate_info => new ProcessStartInfo() { Verb = "runas", WorkingDirectory = null, CreateNoWindow = false, UseShellExecute = true};
+        
         /// <summary>
         ///     Will start an application using Process.Start() with default ProcessStartInfo including 'runas' to elevate priviledges.
         /// </summary>
@@ -73,9 +74,9 @@ namespace nucs.Automation.Scripts {
             var t = __generate_info;
 
             filename = Paths.NormalizePath(filename);
-            if (File.Exists(filename) && File.GetAttributes(filename).HasFlag(FileAttributes.Directory) == false) {
+            if (File.Exists(filename) && File.GetAttributes(filename).HasFlag(FileAttributes.Directory) == false) 
                 t.WorkingDirectory = Path.GetDirectoryName(filename) ?? "";
-            }
+            
 
             t.FileName = filename;
             var proc = Process.Start(t);

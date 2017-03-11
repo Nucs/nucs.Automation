@@ -1,8 +1,8 @@
 namespace nucs.Automation.Controllers {
     /// <summary>
-    ///     A more advanced implementation that allows a press of button with 
+    ///     A more advanced implementation that allows combo pressing.
     /// </summary>
-    public interface IModernKeyboard : IKeyboard {
+    public interface IExtendedKeyboardController : IKeyboardController {
         void Enter();
         void Back();
 

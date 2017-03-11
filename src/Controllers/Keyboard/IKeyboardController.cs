@@ -6,7 +6,7 @@ namespace nucs.Automation.Controllers {
     /// <summary>
     ///     The basic implementation of a keyboard where you can press a button and write text.
     /// </summary>
-    public interface IKeyboard {
+    public interface IKeyboardController {
         /// <summary>
         ///     Writes down the char that this key represents as if it was through the keyboard. - won't work on Keys like 'End' or 'Backspace' or 'Control'
         /// </summary>
